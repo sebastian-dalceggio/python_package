@@ -33,6 +33,7 @@ allow_zero_version = true
 no_git_verify = false
 tag_format = "v{version}"
 version_variables = ["pyproject.toml:project.version"]
+branch = "main"
 
 [tool.semantic_release.branches.main]
 match = "main"
