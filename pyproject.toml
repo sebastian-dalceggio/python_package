@@ -35,9 +35,12 @@ tag_format = "v{version}"
 version_variables = ["pyproject.toml:project.version"]
 
 [tool.semantic_release.branches.main]
-match = "(main|master)"
+match = "main"
+
+[tool.semantic_release.branches.other]
+match = ".*"
 prerelease_token = "rc"
-prerelease = false
+prerelease = true
 
 [tool.semantic_release.changelog]
 exclude_commit_patterns = []
