@@ -30,18 +30,20 @@ commit_parser = "conventional"
 logging_use_named_masks = false
 major_on_zero = true
 allow_zero_version = true
-repo_dir = "/home/sdalc/projects/python_package"
 no_git_verify = false
 tag_format = "v{version}"
 version_variables = ["pyproject.toml:project.version"]
+branch = "main"
 
 [tool.semantic_release.branches.main]
-match = "(main|master)"
+match = "main"
+
+[tool.semantic_release.branches.other]
+match = ".*"
 prerelease_token = "rc"
-prerelease = false
+prerelease = true
 
 [tool.semantic_release.changelog]
-changelog_file = ""
 exclude_commit_patterns = []
 mode = "init"
 insertion_flag = "<!-- version list -->"
