@@ -1,9 +1,12 @@
 name: CI/CD Pipeline
 
 on:
-  push:
+  pull_request:
     branches:
       - main
+
+permissions:
+  contents: write
 
 jobs:
   test:
@@ -14,7 +17,7 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -fsSL https://raw.githubusercontent.com/astral-sh/uv/main/install.sh | sh
+          curl -LsSf https://astral.sh/uv/install.sh | sh
 
       - name: Add uv to PATH
         run: echo "$HOME/.local/bin" >> $GITHUB_PATH
@@ -37,37 +40,35 @@ jobs:
         run: uv pip install pytest
 
       - name: Run pytest
-        run: pytest tests/
+        run: uv run pytest tests/
 
-  version-bump:
+  tag_release:
     needs: test
     runs-on: ubuntu-latest
 
-    permissions:
-        actions: write
-        contents: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-            fetch-depth: 0
-      
-      - name: Bump version using semantic-release
-        uses: python-semantic-release/python-semantic-release@master
-        with:
-            github_token: ${{ secrets.PAT_TOKEN }}
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  merge-dev:
-    needs: version-bump
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Git user
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install toml
+        run: pip install toml
+
+      - name: Extract Version
+        id: extract_version
         run: |
-          git config user.email "github-actions@github.com"
-          git config user.name "GitHub Actions"
-      - name: Merge main into dev
-        run: |
-          git checkout dev
-          git merge origin/main
-          git push origin dev
+          # VERSION=$(jq -r '.project.version' pyproject.toml) # Use jq
+          # Alternative using python:
+          python -c "import toml; data = toml.load('pyproject.toml'); print(data['project']['version'])" > version.txt
+          VERSION=$(cat version.txt)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create Local Tag
+        run: git tag v${{ steps.extract_version.outputs.VERSION }}
+
+      - name: Push Tag
+        run: git push origin refs/tags/v${{ steps.extract_version.outputs.VERSION }}
