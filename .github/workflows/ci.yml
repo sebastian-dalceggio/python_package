@@ -39,36 +39,41 @@ jobs:
       - name: Run pytest
         run: uv run pytest tests/
 
-  version-bump:
-    needs: test
+  tag_release:
     runs-on: ubuntu-latest
 
-    permissions:
-        actions: write
-        contents: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-            fetch-depth: 0
-      
-      - name: Bump version using semantic-release
-        uses: python-semantic-release/python-semantic-release@master
-        with:
-            github_token: ${{ secrets.PAT_TOKEN }}
-            root_options: "-vv"
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  merge-dev:
-    needs: version-bump
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Git user
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install toml
+        run: pip install toml
+
+      - name: Extract Version
+        id: extract_version
         run: |
-          git config user.email "github-actions@github.com"
-          git config user.name "GitHub Actions"
-      - name: Merge main into dev
-        run: |
-          git checkout dev
-          git merge origin/main
-          git push origin dev
+          VERSION=$(jq -r '.tool.poetry.version' pyproject.toml) # Use jq
+          # Alternative using python:
+          # python -c "import toml; data = toml.load('pyproject.toml'); print(data['project']['version'])" > version.txt
+          # VERSION=$(cat version.txt)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create Tag
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = "${{ steps.extract_version.outputs.VERSION }}";
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/v${version}`,
+              sha: context.sha
+            });
+
+      - name: Push Tag
+        run: git push origin refs/tags/v${{ steps.extract_version.outputs.VERSION }}
