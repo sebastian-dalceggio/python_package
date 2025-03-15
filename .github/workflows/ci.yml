@@ -40,6 +40,7 @@ jobs:
         run: uv run pytest tests/
 
   tag_release:
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -51,16 +52,16 @@ jobs:
         with:
           python-version: '3.x'
 
-      # - name: Install toml
-      #   run: pip install toml
+      - name: Install toml
+        run: pip install toml
 
       - name: Extract Version
         id: extract_version
         run: |
-          VERSION=$(jq -r '.project.version' pyproject.toml) # Use jq
+          # VERSION=$(jq -r '.project.version' pyproject.toml) # Use jq
           # Alternative using python:
-          # python -c "import toml; data = toml.load('pyproject.toml'); print(data['project']['version'])" > version.txt
-          # VERSION=$(cat version.txt)
+          python -c "import toml; data = toml.load('pyproject.toml'); print(data['project']['version'])" > version.txt
+          VERSION=$(cat version.txt)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create Tag
