@@ -51,13 +51,13 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install toml
-        run: pip install toml
+      # - name: Install toml
+      #   run: pip install toml
 
       - name: Extract Version
         id: extract_version
         run: |
-          VERSION=$(jq -r '.tool.poetry.version' pyproject.toml) # Use jq
+          VERSION=$(jq -r '.project.version' pyproject.toml) # Use jq
           # Alternative using python:
           # python -c "import toml; data = toml.load('pyproject.toml'); print(data['project']['version'])" > version.txt
           # VERSION=$(cat version.txt)
