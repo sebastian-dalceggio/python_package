@@ -5,8 +5,7 @@ This repository provides a streamlined blueprint for developing new Python packa
 * **uv:** For efficient dependency management and Python version control.
 * **mypy & ruff:** For robust static typing and code linting, ensuring code quality and consistency.
 * **pre-commit:** To automate linting and formatting checks before each commit, maintaining a clean codebase.
-* **python-semantic-release:** For automated versioning and release management based on semantic commit messages.
-* **GitHub Actions:** For continuous integration, automated testing, version updates, and merging `main` into `dev`.
+* **GitHub Actions:** For continuous integration, automated testing, version updates.
 
 ## Getting Started
 
@@ -50,16 +49,8 @@ Follow these steps to initialize your new Python package:
 
     ```bash
     git add .
-    git commit -m "feat: Initial commit of python_package blueprint"
+    git commit -m "Initial commit of python_package blueprint"
     ```
-
-    **Important:** Since you are using `python-semantic-release`, your commit messages should follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification. This allows `python-semantic-release` to automatically determine the next version based on your commit history.
-
-    * `feat`: Indicates a new feature (minor version bump).
-    * `fix`: Indicates a bug fix (patch version bump).
-    * `BREAKING CHANGE`: In the commit message footer, indicates a breaking change (major version bump).
-
-    For the initial commit, `feat: Initial commit of python_package blueprint` is a suitable message.
 
 
 6.  **Push to the `dev` Branch:**
@@ -76,24 +67,7 @@ Follow these steps to initialize your new Python package:
     * You should see a prompt to create a pull request from the `dev` branch to `main`.
     * Follow the instructions to create the pull request.
 
-8.  **Add GitHub Token to Secrets:**
-
-    * Your GitHub Actions workflow requires a GitHub token with specific permissions.
-    * Go to your repository's "Settings" tab.
-    * Click on "Secrets and variables" -> "Actions".
-    * Click "New repository secret".
-    * Name the secret `PAT_TOKEN` (or whatever name your workflow expects).
-    * Paste your personal access token (PAT) into the "Value" field.
-    * Click "Add secret".
-
-    **Important:** Generate a PAT with the following permissions for your workflow:
-
-    * **`contents: write`:** This permission is required for `python-semantic-release` to update the version number, create changelogs, and push commits.
-    * **`actions: write`:** This permission is required if the semantic release action is also creating a github release.
-
-    **Never** commit your PAT directly to your repository.
-
-9.  **Approve the Pull Request and Verify Workflows:**
+8.  **Approve the Pull Request and Verify Workflows:**
 
     * In your GitHub repository, navigate to the pull request you created.
     * Review the changes and approve the pull request.

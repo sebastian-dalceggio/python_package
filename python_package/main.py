@@ -13,6 +13,7 @@ def get_df(rows: int) -> pd.DataFrame:
       pd.DataFrame: A pandas DataFrame with the specified number of rows and columns 'A' and 'B'.
     """
     data_list = [(i, i) for i in range(rows)]
+    print(data_list)
     return pd.DataFrame(data_list, columns=["A", "B"])
 
 def main():
